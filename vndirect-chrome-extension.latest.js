@@ -16,12 +16,12 @@ webpackJsonp([1], [function(e, t, a) {
             appendWrapper()
         }
         if (data.totalBidQtty) {
-            var oldSumBid = parseFloat(document.querySelector('.vn30f1-sumbid').textConent.replace(/,/g,''))
+            var oldSumBid = !document.querySelector('.vn30f1-sumbid').textConent ? 0 : parseFloat(document.querySelector('.vn30f1-sumbid').textConent.replace(/,/g,''))
             if (oldSumBid != data.totalBidQtty) {
                 document.querySelector('.vn30f1-sumbid').textContent = addCommas(data.totalBidQtty) + ';'
                 document.querySelector('.vn30f1-sumbid').style.backgroundColor = oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor
             }
-            var oldSumOffer = parseFloat(document.querySelector('.vn30f1-sumoffer').textConent.replace(/,/g,''))
+            var oldSumOffer = !document.querySelector('.vn30f1-sumoffer').textConent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textConent.replace(/,/g,''))
             if (oldSumOffer != data.totalOfferQtty) {
                 document.querySelector('.vn30f1-sumoffer').textContent = addCommas(data.totalOfferQtty) + ';'
                 document.querySelector('.vn30f1-sumoffer').style.backgroundColor = oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor

@@ -6,26 +6,36 @@
 webpackJsonp([1], [function(e, t, a) {
     var event = a(3)
     window.ee = event
+    var decreaseColor = '#f7941d'
+    var increaseColor = '#1fd525'
+    var darkgreen = '#0f0'
+    var darkred = '#ff3737'
     console.log('Hello World!')
     ee.emitter.on('DERIVATIVEVN30F2006', (data) => {
         if (!document.querySelector('.vn30f1-sumbid')) {
             appendWrapper()
         }
         if (data.totalBidQtty) {
-            if (document.querySelector('.vn30f1-sumbid').textConent != data.totalBidQtty) {
-                document.querySelector('.vn30f1-sumbid').textContent = '' + data.totalBidQtty + ';'
-                document.querySelector('.vn30f1-sumbid').style.backgroundColor = '#f7941d'
-                setTimeout(() => {
-                    document.querySelector('.vn30f1-sumbid').style.backgroundColor = ''
-                }, 1000)
+            var oldSumBid = parseFloat(document.querySelector('.vn30f1-sumbid').textConent.replace(/,/g,''))
+            if (oldSumBid != data.totalBidQtty) {
+                document.querySelector('.vn30f1-sumbid').textContent = addCommas(data.totalBidQtty) + ';'
+                document.querySelector('.vn30f1-sumbid').style.backgroundColor = oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor
             }
-            if (document.querySelector('.vn30f1-sumoffer').textConent != data.totalOfferQtty) {
-                document.querySelector('.vn30f1-sumoffer').textContent = '' + data.totalOfferQtty + ';'
-                document.querySelector('.vn30f1-sumoffer').style.backgroundColor = '#f7941d'
-                setTimeout(() => {
-                    document.querySelector('.vn30f1-sumoffer').style.backgroundColor = ''
-                }, 1000)
+            var oldSumOffer = parseFloat(document.querySelector('.vn30f1-sumoffer').textConent.replace(/,/g,''))
+            if (oldSumOffer != data.totalOfferQtty) {
+                document.querySelector('.vn30f1-sumoffer').textContent = addCommas(data.totalOfferQtty) + ';'
+                document.querySelector('.vn30f1-sumoffer').style.backgroundColor = oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor
             }
+            setTimeout(() => {
+                document.querySelector('.vn30f1-sumbid').style.backgroundColor = ''
+                if (data.totalBidQtty < data.totalOfferQtty) {
+                    document.querySelector('.vn30f1-sumoffer').style.color = darkgreen
+                    document.querySelector('.vn30f1-sumbid').style.color = darkred
+                } else {
+                    document.querySelector('.vn30f1-sumoffer').style.color = darkred
+                    document.querySelector('.vn30f1-sumbid').style.color = darkgreen
+                }
+            }, 1000)
         }
     })
     setTimeout(() => {
@@ -69,5 +79,18 @@ webpackJsonp([1], [function(e, t, a) {
             document.querySelector('body.menu-horizontal .sticky-table-header-wrapper').style.top = "300px"
             document.querySelector('table.proboard').style.marginTop = '90px'
         }
+    }
+
+    function addCommas(nStr)
+    {
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
     }
 }])

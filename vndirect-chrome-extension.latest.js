@@ -1,14 +1,9 @@
-// Code here.
-// If you want to use a variable, use $ and curly braces.
-// For example, to use a fixed random number:
-// NOTE: Do not insert unsafe variables in this way, see below
-// at "Dynamic values in the injected code"
 webpackJsonp([1], [function(e, t, a) {
     var event = a(3)
     window.ee = event
     var decreaseColor = '#f7941d'
     var increaseColor = '#1fd525'
-    var darkgreen = '#0f0'
+    var darkgreen = '#04a004'
     var darkred = '#ff3737'
     console.log('Hello World!')
     ee.emitter.on('DERIVATIVEVN30F2006', (data) => {
@@ -16,18 +11,26 @@ webpackJsonp([1], [function(e, t, a) {
             appendWrapper()
         }
         if (data.totalBidQtty) {
-            var oldSumBid = !document.querySelector('.vn30f1-sumbid').textConent ? 0 : parseFloat(document.querySelector('.vn30f1-sumbid').textConent.replace(/,/g,''))
+            var oldSumBid = !document.querySelector('.vn30f1-sumbid').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumbid').textContent.replace(/,/g,''))
             if (oldSumBid != data.totalBidQtty) {
+                console.log(oldSumBid, addCommas(data.totalBidQtty), oldSumBid - data.totalBidQtty)
                 document.querySelector('.vn30f1-sumbid').textContent = addCommas(data.totalBidQtty) + ';'
                 document.querySelector('.vn30f1-sumbid').style.backgroundColor = oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor
             }
-            var oldSumOffer = !document.querySelector('.vn30f1-sumoffer').textConent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textConent.replace(/,/g,''))
+            var oldSumOffer = !document.querySelector('.vn30f1-sumoffer').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textContent.replace(/,/g,''))
             if (oldSumOffer != data.totalOfferQtty) {
                 document.querySelector('.vn30f1-sumoffer').textContent = addCommas(data.totalOfferQtty) + ';'
                 document.querySelector('.vn30f1-sumoffer').style.backgroundColor = oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor
             }
+            // var deltaNumber = !document.querySelector('.vn30f1-delta').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textContent.replace(/,/g,''))
+            // if (deltaNumber != data.totalOfferQtty) {
+                var delta = data.totalBidQtty  - data.totalOfferQtty
+                document.querySelector('.vn30f1-delta').textContent = addCommas(delta) + ';'
+                document.querySelector('.vn30f1-delta').style.backgroundColor = delta > 0 ? increaseColor : decreaseColor
+            // }
             setTimeout(() => {
                 document.querySelector('.vn30f1-sumbid').style.backgroundColor = ''
+                document.querySelector('.vn30f1-sumoffer').style.backgroundColor = ''
                 if (data.totalBidQtty < data.totalOfferQtty) {
                     document.querySelector('.vn30f1-sumoffer').style.color = darkgreen
                     document.querySelector('.vn30f1-sumbid').style.color = darkred
@@ -62,17 +65,28 @@ webpackJsonp([1], [function(e, t, a) {
         
             var vn30f1SumOfferText = document.createElement('span')
             vn30f1SumOfferText.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
-            vn30f1SumOfferText.classList.add('vn30f1-sumOffer-text')
+            vn30f1SumOfferText.classList.add('vn30f1-sumoffer-text')
             vn30f1SumOfferText.textContent = 'Tổng bán: '
         
             var vn30f1SumOffer = document.createElement('span')
             vn30f1SumOffer.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
             vn30f1SumOffer.classList.add('vn30f1-sumoffer')
         
+            var deltaText = document.createElement('span')
+            deltaText.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
+            deltaText.classList.add('vn30f1-delta-text')
+            deltaText.textContent = ' Chênh lệch: '
+        
+            var deltaNumber = document.createElement('span')
+            deltaNumber.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
+            deltaNumber.classList.add('vn30f1-delta')
+        
             vn30f1.appendChild(vn30f1SumBidText)
             vn30f1.appendChild(vn30f1SumBid)
             vn30f1.appendChild(vn30f1SumOfferText)
             vn30f1.appendChild(vn30f1SumOffer)
+            vn30f1.appendChild(deltaText)
+            vn30f1.appendChild(deltaNumber)
             infobar.appendChild(vn30f1)
             var navigation = document.getElementById('navigation')
             navigation.insertBefore(infobar, document.getElementById('nav'))
@@ -83,14 +97,6 @@ webpackJsonp([1], [function(e, t, a) {
 
     function addCommas(nStr)
     {
-        nStr += '';
-        x = nStr.split('.');
-        x1 = x[0];
-        x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
+        return $.number(nStr, 2);
     }
 }])

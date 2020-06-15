@@ -7,36 +7,36 @@ webpackJsonp([1], [function(e, t, a) {
     var darkred = '#ff3737'
     console.log('Hello World!')
     ee.emitter.on('DERIVATIVEVN30F2006', (data) => {
-        if (!document.querySelector('.vn30f1-sumbid')) {
+        if (!$('.vn30f1-sumbid')) {
             appendWrapper()
         }
         if (data.totalBidQtty) {
-            var oldSumBid = !document.querySelector('.vn30f1-sumbid').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumbid').textContent.replace(/,/g,''))
+            var oldSumBid = !$('.vn30f1-sumbid').text() ? 0 : parseFloat($('.vn30f1-sumbid').text().replace(/,/g,''))
             if (oldSumBid != data.totalBidQtty) {
                 console.log(oldSumBid, addCommas(data.totalBidQtty), oldSumBid - data.totalBidQtty)
-                document.querySelector('.vn30f1-sumbid').textContent = addCommas(data.totalBidQtty) + ';'
-                document.querySelector('.vn30f1-sumbid').style.backgroundColor = oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor
+                $('.vn30f1-sumbid').text() = addCommas(data.totalBidQtty) + ';'
+                $('.vn30f1-sumbid').style.backgroundColor = oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor
             }
-            var oldSumOffer = !document.querySelector('.vn30f1-sumoffer').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textContent.replace(/,/g,''))
+            var oldSumOffer = !$('.vn30f1-sumoffer').text() ? 0 : parseFloat($('.vn30f1-sumoffer').text().replace(/,/g,''))
             if (oldSumOffer != data.totalOfferQtty) {
-                document.querySelector('.vn30f1-sumoffer').textContent = addCommas(data.totalOfferQtty) + ';'
-                document.querySelector('.vn30f1-sumoffer').style.backgroundColor = oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor
+                $('.vn30f1-sumoffer').text() = addCommas(data.totalOfferQtty) + ';'
+                $('.vn30f1-sumoffer').style.backgroundColor = oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor
             }
-            // var deltaNumber = !document.querySelector('.vn30f1-delta').textContent ? 0 : parseFloat(document.querySelector('.vn30f1-sumoffer').textContent.replace(/,/g,''))
+            // var deltaNumber = !$('.vn30f1-delta').text() ? 0 : parseFloat($('.vn30f1-sumoffer').text().replace(/,/g,''))
             // if (deltaNumber != data.totalOfferQtty) {
                 var delta = data.totalBidQtty  - data.totalOfferQtty
-                document.querySelector('.vn30f1-delta').textContent = addCommas(delta) + ';'
-                document.querySelector('.vn30f1-delta').style.backgroundColor = delta > 0 ? increaseColor : decreaseColor
+                $('.vn30f1-delta').text() = addCommas(delta) + ';'
+                $('.vn30f1-delta').style.backgroundColor = delta > 0 ? increaseColor : decreaseColor
             // }
             setTimeout(() => {
-                document.querySelector('.vn30f1-sumbid').style.backgroundColor = ''
-                document.querySelector('.vn30f1-sumoffer').style.backgroundColor = ''
+                $('.vn30f1-sumbid').style.backgroundColor = ''
+                $('.vn30f1-sumoffer').style.backgroundColor = ''
                 if (data.totalBidQtty < data.totalOfferQtty) {
-                    document.querySelector('.vn30f1-sumoffer').style.color = darkgreen
-                    document.querySelector('.vn30f1-sumbid').style.color = darkred
+                    $('.vn30f1-sumoffer').style.color = darkgreen
+                    $('.vn30f1-sumbid').style.color = darkred
                 } else {
-                    document.querySelector('.vn30f1-sumoffer').style.color = darkred
-                    document.querySelector('.vn30f1-sumbid').style.color = darkgreen
+                    $('.vn30f1-sumoffer').style.color = darkred
+                    $('.vn30f1-sumbid').style.color = darkgreen
                 }
             }, 1000)
         }
@@ -46,7 +46,7 @@ webpackJsonp([1], [function(e, t, a) {
     }, 3000)
 
     function appendWrapper() {
-        if (!document.querySelector('.i-infobar')) {
+        if (!$('.i-infobar')) {
             var infobar = document.createElement('div')
             infobar.classList.add('i-infobar')
             infobar.style = 'height: 30px;background-color: white;position: relative'
@@ -57,7 +57,7 @@ webpackJsonp([1], [function(e, t, a) {
             var vn30f1SumBidText = document.createElement('span')
             vn30f1SumBidText.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
             vn30f1SumBidText.classList.add('vn30f1-sumbid-text')
-            vn30f1SumBidText.textContent = 'Tổng mua: '
+            vn30f1SumBidText.text() = 'Tổng mua: '
         
             var vn30f1SumBid = document.createElement('span')
             vn30f1SumBid.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
@@ -66,7 +66,7 @@ webpackJsonp([1], [function(e, t, a) {
             var vn30f1SumOfferText = document.createElement('span')
             vn30f1SumOfferText.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
             vn30f1SumOfferText.classList.add('vn30f1-sumoffer-text')
-            vn30f1SumOfferText.textContent = 'Tổng bán: '
+            vn30f1SumOfferText.text() = 'Tổng bán: '
         
             var vn30f1SumOffer = document.createElement('span')
             vn30f1SumOffer.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
@@ -75,7 +75,7 @@ webpackJsonp([1], [function(e, t, a) {
             var deltaText = document.createElement('span')
             deltaText.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
             deltaText.classList.add('vn30f1-delta-text')
-            deltaText.textContent = ' Chênh lệch: '
+            deltaText.text() = ' Chênh lệch: '
         
             var deltaNumber = document.createElement('span')
             deltaNumber.style = 'color: darkblue;font-size: 16px;margin-top: 5px'
@@ -90,8 +90,8 @@ webpackJsonp([1], [function(e, t, a) {
             infobar.appendChild(vn30f1)
             var navigation = document.getElementById('navigation')
             navigation.insertBefore(infobar, document.getElementById('nav'))
-            document.querySelector('body.menu-horizontal .sticky-table-header-wrapper').style.top = "300px"
-            document.querySelector('table.proboard').style.marginTop = '90px'
+            $('body.menu-horizontal .sticky-table-header-wrapper').style.top = "300px"
+            $('table.proboard').style.marginTop = '90px'
         }
     }
 

@@ -14,16 +14,20 @@ webpackJsonp([1], [function(e, t, a) {
                 let total10OfferPrice = offerPriceKeys.map(f => parseFloat(data[f]) * 1000).reduce((a,b) => a + b, 0)
 
                 let bidCostKeys = Array.from(Array(10).keys()).map(i => {
-                    let bid = parseFloat(data['bidQtty' + `${i + 1}`.padStart(2, '0')]) * 1000,
-                        price = parseFloat(data['bidPrice' + `${i + 1}`.padStart(2, '0')]) * 10,
-                        rate = (10 - i)/10;
+                    if (data['bidPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
+                    let bid = (parseFloat(data['bidQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
+                        price = (parseFloat(data['bidPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
+                        rate = (10 - (i + 1))/10;
+                    console.log(`${bid} * ${price} * ${rate}`)
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
 
                 let offerCostKeys = Array.from(Array(10).keys()).map(i => {
-                    let bid = parseFloat(data['offerQtty' + `${i + 1}`.padStart(2, '0')]) * 1000,
-                        price = parseFloat(data['offerPrice' + `${i + 1}`.padStart(2, '0')]) * 10,
-                        rate = (10 - i)/10;
+                    if (data['offerPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
+                    let bid = (parseFloat(data['offerQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
+                        price = (parseFloat(data['offerPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
+                        rate = (10 - (i + 1))/10;
+                    console.log(`${bid} * ${price} * ${rate}`)
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
 

@@ -1,4 +1,5 @@
-webpackJsonp([1], [function(e, t, a) {
+var webpackJsonp = webpackJsonp || null;
+webpackJsonp && webpackJsonp([1], [function(e, t, a) {
 
     function listener (futureCode) {
         return function (data) {
@@ -13,26 +14,21 @@ webpackJsonp([1], [function(e, t, a) {
                 let totalOfferQtty10 = offerQttyKeys.map(f => parseFloat(data[f]) * 10).reduce((a,b) => a + b, 0)
                 let total10OfferPrice = offerPriceKeys.map(f => parseFloat(data[f]) * 1000).reduce((a,b) => a + b, 0)
 
-                let bidCostKeys = Array.from(Array(10).keys()).map(i => {
+                let totalBid10cost = Array.from(Array(10).keys()).map(i => {
                     if (data['bidPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
                     let bid = (parseFloat(data['bidQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
                         price = (parseFloat(data['bidPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
                         rate = (10 - (i + 1))/10;
-                    console.log(`${bid} * ${price} * ${rate}`)
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
 
-                let offerCostKeys = Array.from(Array(10).keys()).map(i => {
+                let totalOffer10cost = Array.from(Array(10).keys()).map(i => {
                     if (data['offerPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
                     let bid = (parseFloat(data['offerQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
                         price = (parseFloat(data['offerPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
                         rate = (10 - (i + 1))/10;
-                    console.log(`${bid} * ${price} * ${rate}`)
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
-
-                totalBidQtty10 = bidCostKeys
-                totalOfferQtty10 = offerCostKeys
 
                 let oldSumBid = $(futureCodeClass).find('.sumbid').data('prev') || 0;
                 if (oldSumBid != data.totalBidQtty) {
@@ -61,9 +57,6 @@ webpackJsonp([1], [function(e, t, a) {
                         $(futureCodeClass).find('.sumbid').css('color', darkgreen)
                     }
                 }, 1000)
-
-
-
     
                 let oldSumBid10 = $(futureCodeClass).find('.sumbid10').data('prev') || 0;
                 if (oldSumBid10 != totalBidQtty10) {
@@ -83,12 +76,40 @@ webpackJsonp([1], [function(e, t, a) {
                 setTimeout(() => {
                     $(futureCodeClass).find('.sumbid10').css('background-color', '')
                     $(futureCodeClass).find('.sumoffer10').css('background-color', '')
-                    if (data.totalBidQtty < data.totalOfferQtty) {
+                    if (totalBidQtty10 < totalOfferQtty10) {
                         $(futureCodeClass).find('.sumoffer10').css('color', darkgreen)
                         $(futureCodeClass).find('.sumbid10').css('color',  darkred)
                     } else {
                         $(futureCodeClass).find('.sumoffer10').css('color', darkred)
                         $(futureCodeClass).find('.sumbid10').css('color', darkgreen)
+                    }
+                }, 1000)
+
+    
+                let oldSumBid10cost = $(futureCodeClass).find('.sumbid10cost').data('prev') || 0;
+                if (oldSumBid10cost != totalBid10cost) {
+                    $(futureCodeClass).find('.sumbid10cost').text(addCommas(totalBid10cost))
+                    $(futureCodeClass).find('.sumbid10cost').css('background-color', oldSumBid10cost < totalBid10cost ? increaseColor : decreaseColor)
+                    $(futureCodeClass).find('.sumbid10cost').data('prev', totalBid10cost);
+                }
+                let oldSumOffer10cost = $(futureCodeClass).find('.sumoffer10cost').data('prev') || 0;
+                if (oldSumOffer10cost != totalOffer10cost) {
+                    $(futureCodeClass).find('.sumoffer10cost').text(addCommas(totalOffer10cost))
+                    $(futureCodeClass).find('.sumoffer10cost').css('background-color', oldSumOffer10cost < totalOffer10cost ? increaseColor : decreaseColor)
+                    $(futureCodeClass).find('.sumoffer10cost').data('prev', totalOffer10cost)
+                }
+                let delta10cost = totalBid10cost  - totalOffer10cost
+                $(futureCodeClass).find('.delta10cost').text(addCommas(delta10cost))
+                $(futureCodeClass).find('.delta10cost').css('color', delta10cost > 0 ? increaseColor : decreaseColor)
+                setTimeout(() => {
+                    $(futureCodeClass).find('.sumbid10cost').css('background-color', '')
+                    $(futureCodeClass).find('.sumoffer10cost').css('background-color', '')
+                    if (totalBid10cost < totalOffer10cost) {
+                        $(futureCodeClass).find('.sumoffer10cost').css('color', darkgreen)
+                        $(futureCodeClass).find('.sumbid10cost').css('color',  darkred)
+                    } else {
+                        $(futureCodeClass).find('.sumoffer10cost').css('color', darkred)
+                        $(futureCodeClass).find('.sumbid10cost').css('color', darkgreen)
                     }
                 }, 1000)
             }
@@ -98,12 +119,11 @@ webpackJsonp([1], [function(e, t, a) {
     fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
         .then(response => {
             let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
-            console.log(codes)
             codes.splice(0,1).forEach(future => {
                 appendWrapper(future.code)
                 var eventListener = listener(future.code)
                 ee.emitter.on('DERIVATIVE' + future.code, eventListener)
-                ee.emitter.emitter('DERIVATIVE' + future.code, future)
+                ee.emitter.emit('DERIVATIVE' + future.code, future)
             })
 
 
@@ -119,33 +139,34 @@ webpackJsonp([1], [function(e, t, a) {
 
     function appendWrapper(futureCode) {
         let infobar = $('.infobar');
-        if (!infobar.length) infobar = $('<div class="infobar" style="font-size: 14px"><div/>').insertBefore('#nav')
+        if (!infobar.length) infobar = $('<div class="infobar" style="font-size: 14px; margin-top: 5px">').insertBefore('#nav')
         let vn30Class = 'vn30f-' + futureCode;
         if (!$(vn30Class).length) {
             let vn30f = $('<div class="' + vn30Class + '">').appendTo(infobar)
             $('<span style="color: #f7941d">' + futureCode  + ': </span>').appendTo(vn30f)
-            $('<br/>').appendTo(vn30f)
-            $('<span>Σ(KLmua): </span>').appendTo(vn30f)
+            // $('<br/>').appendTo(vn30f)
+            $('<span>B: </span>').appendTo(vn30f)
             $('<span class="sumbid"></span>').appendTo(vn30f)
-            $('<span> Σ(KLbán): </span>').appendTo(vn30f)
-            $('<span class="sumoffer"></span>').appendTo(vn30f)
-            $('<span> Δ(KLmua-KLbán): </span>').appendTo(vn30f)
-            $('<span class="delta"></span>').appendTo(vn30f)
-            $('<br/>').appendTo(vn30f)
-
-            $('<span>Σ(CostB): </span>').appendTo(vn30f)
+            $('<span> | </span>').appendTo(vn30f)
             $('<span class="sumbid10"></span>').appendTo(vn30f)
-            $('<span> Σ(CostS): </span>').appendTo(vn30f)
+            $('<sub>T10</sub>').appendTo(vn30f)
+            $('<span> S: </span>').appendTo(vn30f)
+            $('<span class="sumoffer"></span>').appendTo(vn30f)
+            $('<span> | </span>').appendTo(vn30f)
             $('<span class="sumoffer10"></span>').appendTo(vn30f)
-            $('<span> Δ(CostB-CostS): </span>').appendTo(vn30f)
+            $('<sub>T10</sub>').appendTo(vn30f)
+            $('<span> ΔBS: </span>').appendTo(vn30f)
+            $('<span class="delta"></span>').appendTo(vn30f)
+            $('<span> | </span>').appendTo(vn30f)
             $('<span class="delta10"></span>').appendTo(vn30f)
+            $('<sub>T10</sub>').appendTo(vn30f)
 
-            // $('<span>Σ(CP10mua): </span>').appendTo(vn30f)
-            // $('<span class="sumbid10cost"></span>').appendTo(vn30f)
-            // $('<span> Σ(CP10bán): </span>').appendTo(vn30f)
-            // $('<span class="sumoffer10cost"></span>').appendTo(vn30f)
-            // $('<span> Δ(CP10mua-CP10bán): </span>').appendTo(vn30f)
-            // $('<span class="delta10cost"></span>').appendTo(vn30f)
+            $('<span> CB: </span>').appendTo(vn30f)
+            $('<span class="sumbid10cost"></span>').appendTo(vn30f)
+            $('<span> CS: </span>').appendTo(vn30f)
+            $('<span class="sumoffer10cost"></span>').appendTo(vn30f)
+            $('<span> ΔCBS: </span>').appendTo(vn30f)
+            $('<span class="delta10cost"></span>').appendTo(vn30f)
 
             $('body.menu-horizontal .sticky-table-header-wrapper').css('top', '300px')
             $('table.proboard').css('marginTop', '90px')

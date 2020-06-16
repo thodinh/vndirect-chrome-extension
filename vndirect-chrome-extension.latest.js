@@ -5,6 +5,7 @@ webpackJsonp && webpackJsonp([1], [function(e, t, a) {
         return function (data) {
             let futureCodeClass = '.vn30f-' + futureCode;
             if (data.totalBidQtty) {
+                console.log(data)
                 let bidQttyKeys = Array.from(Array(10).keys()).map(i => 'bidQtty' + `${i + 1}`.padStart(2, '0'))
                 let bidPriceKeys = Array.from(Array(10).keys()).map(i => 'bidPrice' + `${i + 1}`.padStart(2, '0'))
                 let offerQttyKeys = Array.from(Array(10).keys()).map(i => 'offerQtty' + `${i + 1}`.padStart(2, '0'))
@@ -33,13 +34,13 @@ webpackJsonp && webpackJsonp([1], [function(e, t, a) {
                 let oldSumBid = $(futureCodeClass).find('.sumbid').data('prev') || 0;
                 if (oldSumBid != data.totalBidQtty) {
                     console.log(oldSumBid, addCommas(data.totalBidQtty), oldSumBid - data.totalBidQtty)
-                    $(futureCodeClass).find('.sumbid').text(addCommas(data.totalBidQtty))
+                    $(futureCodeClass).find('.sumbid').text(addCommas(data.totalBidQtty * 10))
                     $(futureCodeClass).find('.sumbid').css('background-color', oldSumBid < data.totalBidQtty ? increaseColor : decreaseColor)
                     $(futureCodeClass).find('.sumbid').data('prev', data.totalBidQtty);
                 }
                 let oldSumOffer = $(futureCodeClass).find('.sumoffer').data('prev') || 0;
                 if (oldSumOffer != data.totalOfferQtty) {
-                    $(futureCodeClass).find('.sumoffer').text(addCommas(data.totalOfferQtty))
+                    $(futureCodeClass).find('.sumoffer').text(addCommas(data.totalOfferQtty * 10))
                     $(futureCodeClass).find('.sumoffer').css('background-color', oldSumOffer < data.totalOfferQtty ? increaseColor : decreaseColor)
                     $(futureCodeClass).find('.sumoffer').data('prev', data.totalOfferQtty)
                 }
@@ -119,7 +120,7 @@ webpackJsonp && webpackJsonp([1], [function(e, t, a) {
     fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
         .then(response => {
             let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
-            codes.splice(0,1).forEach(future => {
+            codes.filter(f => f.code === 'VN30F2006').forEach(future => {
                 appendWrapper(future.code)
                 var eventListener = listener(future.code)
                 ee.emitter.on('DERIVATIVE' + future.code, eventListener)
@@ -144,7 +145,6 @@ webpackJsonp && webpackJsonp([1], [function(e, t, a) {
         if (!$(vn30Class).length) {
             let vn30f = $('<div class="' + vn30Class + '">').appendTo(infobar)
             $('<span style="color: #f7941d">' + futureCode  + ': </span>').appendTo(vn30f)
-            // $('<br/>').appendTo(vn30f)
             $('<span>B: </span>').appendTo(vn30f)
             $('<span class="sumbid"></span>').appendTo(vn30f)
             $('<span> | </span>').appendTo(vn30f)

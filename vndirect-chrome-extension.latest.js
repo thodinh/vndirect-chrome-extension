@@ -24,6 +24,13 @@ function setRateBuys() {
         BB = Array.from(Array(10).keys()).map(f => ((10-f*0.2)/10).toFixed(2))
     }
     localStorage.setItem('BB', JSON.stringify(BB))
+    fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
+            .then(response => {
+                let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
+                codes.filter(f => f.code === 'VN30F2006').forEach(future => {
+                    ee.emitter.emit('DERIVATIVE' + future.code, future)
+                })
+            });
 }
 function setRateSells() {
     var response = prompt('Rate sells, vd: 1 0.9 .. 0.1 hoặc expr: i => (10 - i * 0.2) / 10')
@@ -39,6 +46,13 @@ function setRateSells() {
         SS = Array.from(Array(10).keys()).map(f => ((10-f*0.2)/10).toFixed(2));
     }
     localStorage.setItem('SS', JSON.stringify(SS))
+    fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
+            .then(response => {
+                let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
+                codes.filter(f => f.code === 'VN30F2006').forEach(future => {
+                    ee.emitter.emit('DERIVATIVE' + future.code, future)
+                })
+            });
 }
 
 addScript('https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js', () => {

@@ -1,6 +1,9 @@
 var webpackJsonp = webpackJsonp || null;
+window.BB = Array.from(Array(10).keys()).map(f => ((10-f*0.2)/10).toFixed(2))
+window.SS = Array.from(Array(10).keys()).map(f => ((10-f*0.2)/10).toFixed(2))
 webpackJsonp && webpackJsonp([1], [function(e, t, a) {
-
+    window.aa = a
+    window.chart = a(127)
     function listener (futureCode) {
         return function (data) {
             let futureCodeClass = '.vn30f-' + futureCode;
@@ -17,17 +20,17 @@ webpackJsonp && webpackJsonp([1], [function(e, t, a) {
 
                 let totalBid10cost = Array.from(Array(10).keys()).map(i => {
                     if (data['bidPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
-                    let bid = (parseFloat(data['bidQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
-                        price = (parseFloat(data['bidPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
-                        rate = (10 - (i + 1))/10;
+                    let bid = (parseFloat(data['bidQtty' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
+                        price = (parseFloat(data['bidPrice' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
+                        rate = window.BB[i]
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
 
                 let totalOffer10cost = Array.from(Array(10).keys()).map(i => {
                     if (data['offerPrice' + `${i + 1}`.padStart(2, '0')] == "") return 0;
-                    let bid = (parseFloat(data['offerQtty' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
-                        price = (parseFloat(data['offerPrice' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
-                        rate = (10 - (i + 1))/10;
+                    let bid = (parseFloat(data['offerQtty' + `${i + 1}`.padStart(2, '0')]) * 10).toFixed(1),
+                        price = (parseFloat(data['offerPrice' + `${i + 1}`.padStart(2, '0')]) * 1000).toFixed(1),
+                        rate = window.SS[i];
                     return bid * price * rate;
                 }).reduce((a,b) => a+b, 0.0)
 

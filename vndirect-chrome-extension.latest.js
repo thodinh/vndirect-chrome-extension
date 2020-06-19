@@ -53,6 +53,7 @@ window.SSExpr = f => ((10-f*0.2)/10).toFixed(2)
 window.BB = JSON.tryParse(localStorage.getItem('BB')) || Array.from(Array(10).keys()).map(window.BBExpr)
 window.SS = JSON.tryParse(localStorage.getItem('SS')) || Array.from(Array(10).keys()).map(window.SSExpr)
 let vn30 = {};
+let vn30List = [];
 (function(){
     loadJQueryUI()
     loadDialogExtend()
@@ -180,7 +181,7 @@ let vn30 = {};
             }
             else {
                 return function(data) {
-                    if (data.bidPrice02) {
+                    if (vn30List.indexOf(data.code) != -1 && data.bidPrice02) {
                         var dataCode = vn30[data.code] = data
                         let futureCodeClass = '.vn30f-' + futureCode;
                         
@@ -295,23 +296,25 @@ let vn30 = {};
         fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
             .then(response => {
                 let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
-                codes.filter(f => f.code === 'VN30F2006').forEach(future => {
-                    appendWrapper(future.code)
-                    var eventListener = listener(future.code)
-                    ee.emitter.on('DERIVATIVE' + future.code, eventListener)
-                    ee.emitter.emit('DERIVATIVE' + future.code, future)
-                    socketClient.send('s|D:VN30F2006,VN30F2007,VN30F2009,GB05F2103,GB05F2009,GB05F2012,VN30F2012')
-                })
+                console.log(codes)
+                let futures = codes.filter(f => /^VN30/.test(f.code)).sort((f,f1) => {return f.code > f1.code ? 1 : -1})
+                let future = futures[0]
+                appendWrapper(future.code)
+                var eventListener = listener(future.code)
+                ee.emitter.on('DERIVATIVE' + future.code, eventListener)
+                ee.emitter.emit('DERIVATIVE' + future.code, future)
+                socketClient.send('s|D:' + futures.map(f => f.code).join(','))
             });
         fetch('https://price-api.vndirect.com.vn/stocks/snapshot?floorCode=10&top30=true').then(r => r.json())
             .then(response => {
                 let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
+                vn30List = codes.map(f => f.code)
                 let future = codes[0]
                 appendWrapper('VN30BASIC', 1)
                 var eventListener = listener('VN30BASIC', 1)
                 ee.emitter.on('UPDATE_STOCK_PARTIAL_REALTIME', eventListener)
                 ee.emitter.emit('UPDATE_STOCK_PARTIAL_REALTIME', future)
-                socketClient.send('s|S:BID,BVH,CTD,CTG,EIB,FPT,GAS,HDB,HPG,MBB,MSN,MWG,NVL,PLX,PNJ,POW,REE,ROS,SAB,SBT,SSI,STB,TCB,VCB,VHM,VIC,VJC,VNM,VPB,VRE')
+                socketClient.send('s|S:' + vn30List.join(','))
                 
             });
         let event = a(3)
@@ -323,7 +326,6 @@ let vn30 = {};
         console.log('Hello World!')
     
         function appendWrapper(futureCode, isStockCode) {
-            
             let infobar = $('.infobar');
             let dialog = $(`<div id="dialog-infobar" title="Chỉ số phái sinh"></div>`);
             if (!infobar.length) {
@@ -370,6 +372,7 @@ let vn30 = {};
                 if (!$(vn30Class).length) {
                     let vn30f = $('<div style="display: inline-block;" class="' + vn30Class + '">').appendTo(infobar)
                     $('<span style="color: #f7941d">' + futureCode  + ': </span>').appendTo(vn30f)
+                    $('<span>B: </span>').appendTo(vn30f)
                     $('<span class="sumbid10"></span>').appendTo(vn30f)
                     $('<sub>T3</sub>').appendTo(vn30f)
                     $('<span> S: </span>').appendTo(vn30f)
@@ -406,16 +409,8 @@ function showDialogInfoBar() {
     $("#dialog-infobar").dialog({
         autoOpen : false, modal : false, show : "blind", hide : "blind",
         draggable: true, width: '80%',
-        // drag: function(event, ui) {
-        //     var iObj = ui.position
-        //     iObj.top = iObj.top - parseInt($('.header.pullable').css('margin-top'))
-        //     ui.position = iObj;
-        // },
         close: function( event, ui ) {
             if (callback) callback(ui)
-            // setTimeout(() => {
-            //     $("#dialog-infobar").remove()
-            // }, 100)
         }
     }).dialogExtend({
         "closable" : false,
@@ -558,9 +553,9 @@ function setRateBuys() {
     fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
             .then(response => {
                 let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
-                codes.filter(f => f.code === 'VN30F2006').forEach(future => {
-                    ee.emitter.emit('DERIVATIVE' + future.code, future)
-                })
+                let futures = codes.filter(f => /^VN30/.test(f.code)).sort((f,f1) => {return f.code > f1.code ? 1 : -1})
+                let future = futures[0];
+                ee.emitter.emit('DERIVATIVE' + future.code, future)
             });
 }
 function setRateSells() {
@@ -580,9 +575,9 @@ function setRateSells() {
     fetch('https://price-api.vndirect.com.vn/derivatives/snapshot?floorCode=DER01').then(r => r.json())
             .then(response => {
                 let codes = response.map(decodeMessage).map(f => f.split('|')).map(f => transformMessage[f.shift()](f))
-                codes.filter(f => f.code === 'VN30F2006').forEach(future => {
-                    ee.emitter.emit('DERIVATIVE' + future.code, future)
-                })
+                let futures = codes.filter(f => /^VN30/.test(f.code)).sort((f,f1) => {return f.code > f1.code ? 1 : -1})
+                let future = futures[0];
+                ee.emitter.emit('DERIVATIVE' + future.code, future)
             });
 }
 
